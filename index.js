@@ -12,6 +12,12 @@ var events = [
     dd: 23,
     mm: 9,
     yy: 2017
+  },
+  {
+    event: 'NYC/Mini Retro WGGCON 2017',
+    dd: 6,
+    mm: 10,
+    yy: 2017
   }
 ];
 
