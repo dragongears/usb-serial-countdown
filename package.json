@@ -1,0 +1,19 @@
+{
+  "name": "usb-serial-countdown",
+  "version": "1.0.0",
+  "description": "Countdown to events on a USB serial LCD display",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "countdown",
+    "date",
+    "event",
+    "usb",
+    "serial",
+    "lcd"
+  ],
+  "author": "Art Dahm <art@dahm.com> (https://github.com/dragongears)",
+  "license": "ISC"
+}
