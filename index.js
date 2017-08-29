@@ -8,18 +8,24 @@ var events = [
     yy: 2018
   },
   {
-    event: 'Halloween Horror Nights 2017',
+    event: 'HHN Orlando',
     dd: 23,
     mm: 9,
     yy: 2017
   },
   {
-    event: 'NYC/Mini Retro WGGCON 2017',
+    event: 'NY Oct 2017',
     dd: 6,
     mm: 10,
     yy: 2017
   }
 ];
+
+var SerialPort = require("serialport");
+
+var sp = new SerialPort("/dev/ttyACM0", {
+  baudRate: 115200
+});
 
 var DateDiff = require('date-diff');
 
@@ -32,7 +38,7 @@ var DateDiff = require('date-diff');
 // diff.seconds(); // ===> 60393600
 
 var next = 0;
-var max = events.length
+var max = events.length;
 
 function intervalFunc() {
   var date2 = new Date(); // Today
@@ -41,6 +47,10 @@ function intervalFunc() {
   var diff = new DateDiff(date1, date2);
   console.log(events[next].event);
   console.log(Math.ceil(diff.days()).toString() + ' days');
+  sp.write([0xFE,0x58]);
+  sp.write(events[next].event.substr(0, 15));
+  sp.write([0xFE,0x47,0x01,0x02]);
+  sp.write(Math.ceil(diff.days()).toString() + ' days');
 
   // next = next < events.length - 1 ? next + 1 : 0;
   if (++next >= events.length) {
@@ -48,10 +58,22 @@ function intervalFunc() {
   }
 }
 
-setInterval(intervalFunc, 3000);
+// Open serial port
+sp.on('open',function() {
+
+    sp.write([0xFE,0x58]);  // Clear screen
+    sp.write("Countdown");
+
+  // Data from serial (should never happen)
+  sp.on('data', function(data) {
+    console.log('>>>>>', data);
+  });
+
+  setInterval(intervalFunc, 3000);
+});
+
 
 
 // TODO Sort dates
-// TODO Send to serial
 // TODO Add/Remove dates
-// TODO Persistant storage
+// TODO Persistent storage
