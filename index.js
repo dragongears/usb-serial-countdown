@@ -1,4 +1,4 @@
-console.log('test');
+console.log('Countdown');
 
 var events = [
   {
@@ -31,17 +31,27 @@ var DateDiff = require('date-diff');
 // diff.minutes(); // ===> 1006560
 // diff.seconds(); // ===> 60393600
 
+var next = 0;
+var max = events.length
+
 function intervalFunc() {
   var date2 = new Date(); // Today
 
-  events.forEach(function(item, index){
-    var date1 = new Date(item.yy, item.mm-1, item.dd); // Target date
-    var diff = new DateDiff(date1, date2);
-    console.log(item.event);
-    console.log(Math.ceil(diff.days()).toString() + ' days');
-  });
+  var date1 = new Date(events[next].yy, events[next].mm-1, events[next].dd); // Target date
+  var diff = new DateDiff(date1, date2);
+  console.log(events[next].event);
+  console.log(Math.ceil(diff.days()).toString() + ' days');
 
-
+  // next = next < events.length - 1 ? next + 1 : 0;
+  if (++next >= events.length) {
+    next = 0;
+  }
 }
 
 setInterval(intervalFunc, 3000);
+
+
+// TODO Sort dates
+// TODO Send to serial
+// TODO Add/Remove dates
+// TODO Persistant storage

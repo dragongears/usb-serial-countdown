@@ -15,5 +15,8 @@
     "lcd"
   ],
   "author": "Art Dahm <art@dahm.com> (https://github.com/dragongears)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "date-diff": "^0.1.3"
+  }
 }
