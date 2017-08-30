@@ -25,12 +25,8 @@ var events = [
 var cmds = {
   start: start,
   list: list,
-  add: function(){
-    console.log('cmd: add');
-  },
-  remove: function(){
-    console.log('cmd: remove ' + args[1]);
-  },
+  add: add,
+  remove: remove,
   stop: function(){
     console.log('cmd: stop');
   }
@@ -40,6 +36,28 @@ var args = process.argv.slice(2);
 
 args[0] && cmds[args[0]]();
 
+
+///////////////////////////////////////
+function add() {
+  var newEvent = {};
+  var match = args[2].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (match) {
+    newEvent.dd = match[1];
+    newEvent.mm = match[2];
+    newEvent.yy = match[3];
+    newEvent.event = args[1];
+    events.push(newEvent);
+  }
+
+  list();
+}
+
+///////////////////////////////////////
+function remove() {
+  events.splice(args[1], 1);
+
+  list();
+}
 
 ///////////////////////////////////////
 function list() {
@@ -103,5 +121,4 @@ function start() {
 }
 
 // TODO Sort dates
-// TODO Add/Remove dates
 // TODO Persistent storage
