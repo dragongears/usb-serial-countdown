@@ -1,32 +1,47 @@
 console.log('Countdown');
 console.log('---------');
 
-var events = [
-  {
-    event: 'Gen Con 2018',
-    dd: 1,
-    mm: 8,
-    yy: 2018
-  },
-  {
-    event: 'HHN Orlando',
-    dd: 23,
-    mm: 9,
-    yy: 2017
-  },
-  {
-    event: 'NY Oct 2017',
-    dd: 6,
-    mm: 10,
-    yy: 2017
-  }
-];
+// var events = [
+//   {
+//     event: 'Gen Con 2018',
+//     dd: 1,
+//     mm: 8,
+//     yy: 2018
+//   },
+//   {
+//     event: 'HHN Orlando',
+//     dd: 23,
+//     mm: 9,
+//     yy: 2017
+//   },
+//   {
+//     event: 'NY Oct 2017',
+//     dd: 6,
+//     mm: 10,
+//     yy: 2017
+//   }
+// ];
+//
+
+var jsonfile = require('jsonfile');
+var file = 'events.json';
+
+try {
+  events = jsonfile.readFileSync(file);
+}
+
+catch (e) {
+  jsonfile.writeFileSync(file, "[]");
+}
+
+var events;
 
 var cmds = {
   start: start,
   list: list,
   add: add,
   remove: remove,
+  clear: clear,
   stop: function(){
     console.log('cmd: stop');
   }
@@ -35,6 +50,45 @@ var cmds = {
 var args = process.argv.slice(2);
 
 args[0] && cmds[args[0]]();
+
+function dayCompare(a, b) {
+  if (a.dd < b.dd) {
+    return -1;
+  }
+  if (a.dd > b.dd) {
+    return 1;
+  }
+  return 0;
+
+}
+
+function monthCompare(a, b) {
+  if (a.mm < b.mm) {
+    return -1;
+  }
+  if (a.mm > b.mm) {
+    return 1;
+  }
+  return 0;
+
+}
+
+function yearCompare(a, b) {
+  if (a.yy < b.yy) {
+    return -1;
+  }
+  if (a.yy > b.yy) {
+    return 1;
+  }
+  return 0;
+
+}
+
+function sortEvents() {
+  events = events.sort(monthCompare);
+  events = events.sort(dayCompare);
+  events = events.sort(yearCompare);
+}
 
 
 ///////////////////////////////////////
@@ -49,6 +103,10 @@ function add() {
     events.push(newEvent);
   }
 
+  sortEvents();
+
+  jsonfile.writeFileSync(file, events, {spaces: 2});
+
   list();
 }
 
@@ -56,13 +114,24 @@ function add() {
 function remove() {
   events.splice(args[1], 1);
 
+  jsonfile.writeFileSync(file, events, {spaces: 2});
+
+  list();
+}
+
+///////////////////////////////////////
+function clear() {
+  events = [];
+
+  jsonfile.writeFileSync(file, events, {spaces: 2});
+
   list();
 }
 
 ///////////////////////////////////////
 function list() {
   events.forEach(function(event, idx) {
-    console.log(idx + ') ' + event.event);
+    console.log(idx + ') ' + event.event + ' ' + event.dd + '/' + event.mm + '/' + event.yy);
   });
 }
 
@@ -99,13 +168,12 @@ function start() {
     sp.write([0xFE,0x47,0x01,0x02]);
     sp.write(Math.ceil(diff.days()).toString() + ' days');
 
-    // next = next < events.length - 1 ? next + 1 : 0;
     if (++next >= events.length) {
       next = 0;
     }
   }
 
-// Open serial port
+  // Open serial port
   sp.on('open',function() {
 
     sp.write([0xFE,0x58]);  // Clear screen
@@ -116,9 +184,15 @@ function start() {
       console.log('>>>>>', data);
     });
 
-    setInterval(intervalFunc, 3000);
+    if (max != 0) {
+      setInterval(intervalFunc, 3000);
+    } else {
+      sp.write([0xFE,0x58]);
+      sp.write('No events', function() {
+        sp.close();
+      });
+    }
   });
 }
 
-// TODO Sort dates
-// TODO Persistent storage
+// TODO Color background?
