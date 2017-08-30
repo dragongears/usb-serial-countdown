@@ -1,4 +1,5 @@
 console.log('Countdown');
+console.log('---------');
 
 var events = [
   {
@@ -21,13 +22,41 @@ var events = [
   }
 ];
 
-var SerialPort = require("serialport");
+var cmds = {
+  start: start,
+  list: list,
+  add: function(){
+    console.log('cmd: add');
+  },
+  remove: function(){
+    console.log('cmd: remove ' + args[1]);
+  },
+  stop: function(){
+    console.log('cmd: stop');
+  }
+};
 
-var sp = new SerialPort("/dev/ttyACM0", {
-  baudRate: 115200
-});
+var args = process.argv.slice(2);
 
-var DateDiff = require('date-diff');
+args[0] && cmds[args[0]]();
+
+
+///////////////////////////////////////
+function list() {
+  events.forEach(function(event, idx) {
+    console.log(idx + ') ' + event.event);
+  });
+}
+
+///////////////////////////////////////
+function start() {
+  var SerialPort = require("serialport");
+
+  var sp = new SerialPort("/dev/ttyACM0", {
+    baudRate: 115200
+  });
+
+  var DateDiff = require('date-diff');
 
 // diff.years(); // ===> 1.9
 // diff.months(); // ===> 23
@@ -37,42 +66,41 @@ var DateDiff = require('date-diff');
 // diff.minutes(); // ===> 1006560
 // diff.seconds(); // ===> 60393600
 
-var next = 0;
-var max = events.length;
+  var next = 0;
+  var max = events.length;
 
-function intervalFunc() {
-  var date2 = new Date(); // Today
+  function intervalFunc() {
+    var date2 = new Date(); // Today
 
-  var date1 = new Date(events[next].yy, events[next].mm-1, events[next].dd); // Target date
-  var diff = new DateDiff(date1, date2);
-  console.log(events[next].event);
-  console.log(Math.ceil(diff.days()).toString() + ' days');
-  sp.write([0xFE,0x58]);
-  sp.write(events[next].event.substr(0, 15));
-  sp.write([0xFE,0x47,0x01,0x02]);
-  sp.write(Math.ceil(diff.days()).toString() + ' days');
+    var date1 = new Date(events[next].yy, events[next].mm-1, events[next].dd); // Target date
+    var diff = new DateDiff(date1, date2);
+    console.log(events[next].event);
+    console.log(Math.ceil(diff.days()).toString() + ' days');
+    sp.write([0xFE,0x58]);
+    sp.write(events[next].event.substr(0, 15));
+    sp.write([0xFE,0x47,0x01,0x02]);
+    sp.write(Math.ceil(diff.days()).toString() + ' days');
 
-  // next = next < events.length - 1 ? next + 1 : 0;
-  if (++next >= events.length) {
-    next = 0;
+    // next = next < events.length - 1 ? next + 1 : 0;
+    if (++next >= events.length) {
+      next = 0;
+    }
   }
-}
 
 // Open serial port
-sp.on('open',function() {
+  sp.on('open',function() {
 
     sp.write([0xFE,0x58]);  // Clear screen
     sp.write("Countdown");
 
-  // Data from serial (should never happen)
-  sp.on('data', function(data) {
-    console.log('>>>>>', data);
+    // Data from serial (should never happen)
+    sp.on('data', function(data) {
+      console.log('>>>>>', data);
+    });
+
+    setInterval(intervalFunc, 3000);
   });
-
-  setInterval(intervalFunc, 3000);
-});
-
-
+}
 
 // TODO Sort dates
 // TODO Add/Remove dates
