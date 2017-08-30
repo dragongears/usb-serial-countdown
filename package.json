@@ -1,7 +1,7 @@
 {
   "name": "usb-serial-countdown",
   "version": "1.0.0",
-  "description": "Countdown to events on a USB serial LCD display",
+  "description": "Countdown the days to events on a USB serial LCD display",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
