@@ -49,13 +49,13 @@ var cmds = {
 
 var args = process.argv.slice(2);
 
-args[0] && cmds[args[0]]();
+args[0] && cmds[args[0]] && cmds[args[0]]();
 
 function dayCompare(a, b) {
-  if (a.dd < b.dd) {
+  if (parseInt(a.dd, 10) < parseInt(b.dd, 10)) {
     return -1;
   }
-  if (a.dd > b.dd) {
+  if (parseInt(a.dd, 10) > parseInt(b.dd, 10)) {
     return 1;
   }
   return 0;
@@ -63,10 +63,10 @@ function dayCompare(a, b) {
 }
 
 function monthCompare(a, b) {
-  if (a.mm < b.mm) {
+  if (parseInt(a.mm, 10) < parseInt(b.mm, 10)) {
     return -1;
   }
-  if (a.mm > b.mm) {
+  if (parseInt(a.mm, 10) > parseInt(b.mm, 10)) {
     return 1;
   }
   return 0;
@@ -74,10 +74,10 @@ function monthCompare(a, b) {
 }
 
 function yearCompare(a, b) {
-  if (a.yy < b.yy) {
+  if (parseInt(a.yy, 10) < parseInt(b.yy, 10)) {
     return -1;
   }
-  if (a.yy > b.yy) {
+  if (parseInt(a.yy, 10) > parseInt(b.yy, 10)) {
     return 1;
   }
   return 0;
@@ -85,8 +85,8 @@ function yearCompare(a, b) {
 }
 
 function sortEvents() {
-  events = events.sort(monthCompare);
   events = events.sort(dayCompare);
+  events = events.sort(monthCompare);
   events = events.sort(yearCompare);
 }
 
@@ -96,8 +96,8 @@ function add() {
   var newEvent = {};
   var match = args[2].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (match) {
-    newEvent.dd = match[1];
-    newEvent.mm = match[2];
+    newEvent.mm = match[1];
+    newEvent.dd = match[2];
     newEvent.yy = match[3];
     newEvent.event = args[1];
     events.push(newEvent);
