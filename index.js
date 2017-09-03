@@ -1,27 +1,7 @@
+#!/usr/bin/env node
+
 console.log('Countdown');
 console.log('---------');
-
-// var events = [
-//   {
-//     event: 'Gen Con 2018',
-//     dd: 1,
-//     mm: 8,
-//     yy: 2018
-//   },
-//   {
-//     event: 'HHN Orlando',
-//     dd: 23,
-//     mm: 9,
-//     yy: 2017
-//   },
-//   {
-//     event: 'NY Oct 2017',
-//     dd: 6,
-//     mm: 10,
-//     yy: 2017
-//   }
-// ];
-//
 
 var jsonfile = require('jsonfile');
 var file = 'events.json';
@@ -154,19 +134,32 @@ function start() {
 // diff.seconds(); // ===> 60393600
 
   var next = 0;
-  var max = events.length;
 
   function intervalFunc() {
     var date2 = new Date(); // Today
 
     var date1 = new Date(events[next].yy, events[next].mm-1, events[next].dd); // Target date
     var diff = new DateDiff(date1, date2);
-    console.log(events[next].event);
-    console.log(Math.ceil(diff.days()).toString() + ' days');
-    sp.write([0xFE,0x58]);
-    sp.write(events[next].event.substr(0, 15));
-    sp.write([0xFE,0x47,0x01,0x02]);
-    sp.write(Math.ceil(diff.days()).toString() + ' days');
+    var days = Math.ceil(diff.days());
+
+    if (days < 1) {
+      events.splice(next, 1);
+      jsonfile.writeFileSync(file, events, {spaces: 2});
+      next = 0;
+      if (events.length === 0) {
+        sp.write([0xFE,0x58]);
+        sp.write('No events', function() {
+          sp.close();
+        });
+      }
+    } else {
+      console.log(events[next].event);
+      console.log(days.toString() + ' days');
+      sp.write([0xFE,0x58]);
+      sp.write(events[next].event.substr(0, 15));
+      sp.write([0xFE,0x47,0x01,0x02]);
+      sp.write(days.toString() + ' days');
+    }
 
     if (++next >= events.length) {
       next = 0;
@@ -184,7 +177,7 @@ function start() {
       console.log('>>>>>', data);
     });
 
-    if (max != 0) {
+    if (events.length !== 0) {
       setInterval(intervalFunc, 3000);
     } else {
       sp.write([0xFE,0x58]);
@@ -195,4 +188,7 @@ function start() {
   });
 }
 
+// TODO Time zone adjust
+// TODO Fix "1 Days"
 // TODO Color background?
+// TODO Prefs: Cycle rate, Background color
