@@ -6,15 +6,19 @@ console.log('---------');
 var jsonfile = require('jsonfile');
 var file = 'events.json';
 
-try {
-  events = jsonfile.readFileSync(file);
-}
-
-catch (e) {
-  jsonfile.writeFileSync(file, "[]");
-}
-
 var events;
+
+readEventFile();
+
+function readEventFile() {
+  try {
+    events = jsonfile.readFileSync(file);
+  }
+
+  catch (e) {
+    jsonfile.writeFileSync(file, "[]");
+  }
+}
 
 var cmds = {
   start: start,
@@ -111,7 +115,7 @@ function clear() {
 ///////////////////////////////////////
 function list() {
   events.forEach(function(event, idx) {
-    console.log(idx + ') ' + event.event + ' ' + event.dd + '/' + event.mm + '/' + event.yy);
+    console.log(idx + ') ' + event.event + ' ' + event.mm + '/' + event.dd + '/' + event.yy);
   });
 }
 
@@ -136,34 +140,42 @@ function start() {
   var next = 0;
 
   function intervalFunc() {
-    var date2 = new Date(); // Today
+    if (events.length !== 0) {
+      var date2 = new Date(); // Today
 
-    var date1 = new Date(events[next].yy, events[next].mm-1, events[next].dd); // Target date
-    var diff = new DateDiff(date1, date2);
-    var days = Math.ceil(diff.days());
+      var date1 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
+      var diff = new DateDiff(date1, date2);
+      var days = Math.ceil(diff.days());
 
-    if (days < 1) {
-      events.splice(next, 1);
-      jsonfile.writeFileSync(file, events, {spaces: 2});
-      next = 0;
-      if (events.length === 0) {
-        sp.write([0xFE,0x58]);
-        sp.write('No events', function() {
-          sp.close();
-        });
+      if (days < 1) {
+        events.splice(next, 1);
+        jsonfile.writeFileSync(file, events, {spaces: 2});
+        next = 0;
+        if (events.length === 0) {
+          sp.write([0xFE, 0x58]);
+          sp.write('No events', function () {
+            sp.close();
+          });
+        }
+      } else {
+        console.log(events[next].event);
+        console.log(days.toString() + ' days');
+        sp.write([0xFE, 0x58]);
+        sp.write(events[next].event.substr(0, 15));
+        sp.write([0xFE, 0x47, 0x01, 0x02]);
+        sp.write(days.toString() + ' days');
+      }
+
+      if (++next >= events.length) {
+        next = 0;
       }
     } else {
-      console.log(events[next].event);
-      console.log(days.toString() + ' days');
-      sp.write([0xFE,0x58]);
-      sp.write(events[next].event.substr(0, 15));
-      sp.write([0xFE,0x47,0x01,0x02]);
-      sp.write(days.toString() + ' days');
-    }
+    sp.write([0xFE,0x58]);
+    sp.write('No events');
+  }
 
-    if (++next >= events.length) {
-      next = 0;
-    }
+  readEventFile();
+
   }
 
   // Open serial port
@@ -177,18 +189,10 @@ function start() {
       console.log('>>>>>', data);
     });
 
-    if (events.length !== 0) {
-      setInterval(intervalFunc, 3000);
-    } else {
-      sp.write([0xFE,0x58]);
-      sp.write('No events', function() {
-        sp.close();
-      });
-    }
+    setInterval(intervalFunc, 3000);
   });
 }
 
-// TODO Time zone adjust
 // TODO Fix "1 Days"
 // TODO Color background?
 // TODO Prefs: Cycle rate, Background color
