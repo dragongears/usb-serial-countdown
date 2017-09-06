@@ -33,6 +33,16 @@ var cmds = {
 
 var args = process.argv.slice(2);
 
+if (args.length === 0) {
+  console.log('Commands:');
+  console.log('List - List events');
+  console.log('Add - Add an event ("Event title" 12/18/2018)');
+  console.log('Remove - Remove an event (Specify index of event from List command)');
+  console.log('Start - Start displaying event countdowns');
+  console.log('Clear - Clear the list of events');
+  console.log('');
+}
+
 args[0] && cmds[args[0]] && cmds[args[0]]();
 
 function dayCompare(a, b) {
