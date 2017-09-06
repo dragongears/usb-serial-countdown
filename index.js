@@ -151,6 +151,7 @@ function start() {
 
   function intervalFunc() {
     if (events.length !== 0) {
+      var daysStr = [' day', ' days'];
       var date2 = new Date(); // Today
 
       var date1 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
@@ -169,11 +170,11 @@ function start() {
         }
       } else {
         console.log(events[next].event);
-        console.log(days.toString() + ' days');
+        console.log(days.toString() + daysStr[+!!(days-1)]);
         sp.write([0xFE, 0x58]);
         sp.write(events[next].event.substr(0, 15));
         sp.write([0xFE, 0x47, 0x01, 0x02]);
-        sp.write(days.toString() + ' days');
+        sp.write(days.toString() + daysStr[+!!(days-1)]);
       }
 
       if (++next >= events.length) {
@@ -203,6 +204,5 @@ function start() {
   });
 }
 
-// TODO Fix "1 Days"
 // TODO Color background?
 // TODO Prefs: Cycle rate, Background color
