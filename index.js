@@ -181,11 +181,15 @@ function start() {
         next = 0;
       }
     } else {
-    sp.write([0xFE,0x58]);
-    sp.write('No events');
-  }
+      sp.write([0xFE,0x58]);
+      sp.write('No events');
+    }
 
-  readEventFile();
+    readEventFile();
+
+    if (next >= events.length) {
+      next = 0;
+    }
 
   }
 
