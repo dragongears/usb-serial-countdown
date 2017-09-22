@@ -4,6 +4,7 @@
   "description": "Countdown the days to events on a USB serial LCD display",
   "main": "index.js",
   "scripts": {
+    "start": "nohup ./index.js start >/dev/null 2>&1 &",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
