@@ -158,7 +158,7 @@ function start() {
       var diff = new DateDiff(date1, date2);
       var days = Math.ceil(diff.days());
 
-      if (days < 1) {
+      if (days < 0) {
         events.splice(next, 1);
         jsonfile.writeFileSync(file, events, {spaces: 2});
         next = 0;
@@ -168,6 +168,13 @@ function start() {
             sp.close();
           });
         }
+      } else if (days == 0) {
+        console.log(events[next].event);
+        console.log(days.toString() + daysStr[+!!(days-1)]);
+        sp.write([0xFE, 0x58]);
+        sp.write(events[next].event.substr(0, 15));
+        sp.write([0xFE, 0x47, 0x01, 0x02]);
+        sp.write('Today!');
       } else {
         console.log(events[next].event);
         console.log(days.toString() + daysStr[+!!(days-1)]);
