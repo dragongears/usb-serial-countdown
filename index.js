@@ -26,7 +26,13 @@ var defaultSettings = {
 
 var events = readJsonFile(eventsFilename, []);
 var settings = readJsonFile(settingsFilename, defaultSettings);
+
 var oldColor = settings.color;
+
+if (settings.stop) {
+  settings.stop = false
+  jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+}
 
 function readJsonFile(filename, defaults) {
   try {
