@@ -3,20 +3,29 @@
 console.log('Countdown');
 console.log('---------');
 
+var SerialPort = require("serialport");
+
 var jsonfile = require('jsonfile');
-var file = 'events.json';
+var eventsFilename = 'events.json';
+var settingsFilename = 'settings.json';
 
-var events;
+var events = readJsonFile(eventsFilename, []);
+var settings = readJsonFile(settingsFilename,
+  {stop: false}
+);
 
-readEventFile();
+var intervalID;
 
-function readEventFile() {
+function readJsonFile(filename, defaults) {
+  console.log ("Reading " + filename);
   try {
-    events = jsonfile.readFileSync(file);
+    return jsonfile.readFileSync(filename);
   }
 
   catch (e) {
-    jsonfile.writeFileSync(file, "[]");
+    console.log('Writing ' + filename);
+    jsonfile.writeFileSync(filename, defaults, {spaces: 2});
+    return defaults
   }
 }
 
@@ -26,9 +35,7 @@ var cmds = {
   add: add,
   remove: remove,
   clear: clear,
-  stop: function(){
-    console.log('cmd: stop');
-  }
+  stop: stop
 };
 
 var args = process.argv.slice(2);
@@ -99,7 +106,7 @@ function add() {
 
   sortEvents();
 
-  jsonfile.writeFileSync(file, events, {spaces: 2});
+  jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
 
   list();
 }
@@ -108,7 +115,7 @@ function add() {
 function remove() {
   events.splice(args[1], 1);
 
-  jsonfile.writeFileSync(file, events, {spaces: 2});
+  jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
 
   list();
 }
@@ -117,7 +124,7 @@ function remove() {
 function clear() {
   events = [];
 
-  jsonfile.writeFileSync(file, events, {spaces: 2});
+  jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
 
   list();
 }
@@ -130,12 +137,20 @@ function list() {
 }
 
 ///////////////////////////////////////
-function start() {
-  var SerialPort = require("serialport");
+function stop() {
+  settings.stop = true
+  jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+  console.log('settings.stop ' + settings.stop)
+}
 
-  var sp = new SerialPort("/dev/ttyACM0", {
-    baudRate: 115200
-  });
+///////////////////////////////////////
+function start() {
+  var sp = new SerialPort(
+    "/dev/ttyACM0",
+    {
+      baudRate: 115200
+    }
+  );
 
   var DateDiff = require('date-diff');
 
@@ -160,12 +175,12 @@ function start() {
 
       if (days < 0) {
         events.splice(next, 1);
-        jsonfile.writeFileSync(file, events, {spaces: 2});
+        jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
         next = 0;
         if (events.length === 0) {
           sp.write([0xFE, 0x58]);
           sp.write('No events', function () {
-            sp.close();
+            stop();
           });
         }
       } else if (days == 0) {
@@ -192,7 +207,27 @@ function start() {
       sp.write('No events');
     }
 
-    readEventFile();
+    events = readJsonFile(eventsFilename, JSON.stringify([]));
+    settings = readJsonFile(settingsFilename,
+      [
+        {stop: false}
+      ]
+    );
+
+    if (settings.stop) {
+      console.log('Stopping...')
+
+      // Stop interval
+      clearInterval(intervalID);
+
+      // Close serial
+      sp.close(function (err) {
+
+      });
+      // Set stop in prefs to false
+      settings.stop = false
+      jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+    }
 
     if (next >= events.length) {
       next = 0;
@@ -200,8 +235,12 @@ function start() {
 
   }
 
-  // Open serial port
-  sp.on('open',function() {
+	sp.on('error', function(err) {
+	  console.log(err.message)
+	});
+
+	// Open serial port
+  sp.on('open', function() {
 
     sp.write([0xFE,0x58]);  // Clear screen
     sp.write("Countdown");
@@ -211,7 +250,7 @@ function start() {
       console.log('>>>>>', data);
     });
 
-    setInterval(intervalFunc, 3000);
+    intervalID = setInterval(intervalFunc, 3000);
   });
 }
 
