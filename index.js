@@ -69,10 +69,10 @@ if (args.length === 0) {
 args[0] && cmds[args[0]] && cmds[args[0]]();
 
 function dayCompare(a, b) {
-  if (parseInt(a.dd, 10) < parseInt(b.dd, 10)) {
+  if (a.dd < b.dd) {
     return -1;
   }
-  if (parseInt(a.dd, 10) > parseInt(b.dd, 10)) {
+  if (a.dd > b.dd) {
     return 1;
   }
   return 0;
@@ -80,10 +80,10 @@ function dayCompare(a, b) {
 }
 
 function monthCompare(a, b) {
-  if (parseInt(a.mm, 10) < parseInt(b.mm, 10)) {
+  if (a.mm < b.mm) {
     return -1;
   }
-  if (parseInt(a.mm, 10) > parseInt(b.mm, 10)) {
+  if (a.mm > b.mm) {
     return 1;
   }
   return 0;
@@ -91,10 +91,10 @@ function monthCompare(a, b) {
 }
 
 function yearCompare(a, b) {
-  if (parseInt(a.yy, 10) < parseInt(b.yy, 10)) {
+  if (a.yy < b.yy) {
     return -1;
   }
-  if (parseInt(a.yy, 10) > parseInt(b.yy, 10)) {
+  if (a.yy > b.yy) {
     return 1;
   }
   return 0;
