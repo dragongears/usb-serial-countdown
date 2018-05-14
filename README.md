@@ -13,3 +13,5 @@ Remove - Remove an event (Specify index of event from List command)
 Start - Start displaying event countdowns
 Stop - Stop displaying event countdowns
 Clear - Clear the list of events
+Speed - Number of seconds to show each event (1-5)
+Color - Display background color (White, Red, Orange, Yellow, Green, Blue, Purple)

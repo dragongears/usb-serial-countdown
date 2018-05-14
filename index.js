@@ -3,6 +3,16 @@
 console.log('Countdown');
 console.log('---------');
 
+var colors = {
+  white: [0xFF, 0xFF, 0xFF],
+  red: [0xFF, 0x00, 0x00],
+  orange: [0xFF, 0x20, 0x00],
+  yellow: [0xFF, 0x80, 0x00],
+  green: [0x00, 0xFF, 0x00],
+  blue: [0x00, 0x00, 0xFF],
+  purple: [0xFF, 0x00, 0xFF],
+}
+
 var SerialPort = require("serialport");
 
 var jsonfile = require('jsonfile');
@@ -16,6 +26,7 @@ var defaultSettings = {
 
 var events = readJsonFile(eventsFilename, []);
 var settings = readJsonFile(settingsFilename, defaultSettings);
+var oldColor = settings.color;
 
 function readJsonFile(filename, defaults) {
   try {
@@ -35,7 +46,8 @@ var cmds = {
   remove: remove,
   clear: clear,
   stop: stop,
-  speed: speed
+  speed: speed,
+  color, color
 };
 
 var args = process.argv.slice(2);
@@ -49,6 +61,8 @@ if (args.length === 0) {
   console.log('Stop - Stop displaying event countdowns');
   console.log('Clear - Clear the list of events');
   console.log('Speed - Number of seconds to show each event (1-5)');
+  console.log('Color - Display background color');
+  console.log('        (White, Red, Orange, Yellow, Green, Blue, Purple)');
   console.log('');
 }
 
@@ -95,8 +109,22 @@ function sortEvents() {
 
 
 ///////////////////////////////////////
+function color() {
+  var color = args[1];
+
+  if (!colors[color]) {
+    console.log('Color must be white, red, orange, yellow, green, blue, or purple');
+  } else if (color === oldColor) {
+    console.log('Color is already ' + color)
+  } else {
+    console.log('Color set to ' + color)
+    settings.color = oldColor = color;
+    jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+  }
+}
+
+///////////////////////////////////////
 function speed() {
-  var newEvent = {};
   var match = args[1].match(/(\d{1})/);
   if (match) {
     var speed = Number(match[1]);
@@ -226,13 +254,19 @@ function start() {
       sp.write('No events');
     }
 
-    events = readJsonFile(eventsFilename, JSON.stringify([]));
+    events = readJsonFile(eventsFilename, []);
 
     if (next >= events.length) {
       next = 0;
     }
 
     settings = readJsonFile(settingsFilename, defaultSettings);
+
+    if (settings.color !== oldColor) {
+      oldColor = settings.color;
+      sp.write([0xFE, 0xD0]);
+      sp.write(colors[settings.color]);
+    }
 
     if (settings.stop) {
       console.log('Stopping...')
