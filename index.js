@@ -144,9 +144,9 @@ function add() {
   var newEvent = {};
   var match = args[2].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (match) {
-    newEvent.mm = match[1];
-    newEvent.dd = match[2];
-    newEvent.yy = match[3];
+    newEvent.mm = Number(match[1]);
+    newEvent.dd = Number(match[2]);
+    newEvent.yy = Number(match[3]);
     newEvent.event = args[1];
     events.push(newEvent);
   }
