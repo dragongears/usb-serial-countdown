@@ -9,21 +9,20 @@ var jsonfile = require('jsonfile');
 var eventsFilename = 'events.json';
 var settingsFilename = 'settings.json';
 
-var events = readJsonFile(eventsFilename, []);
-var settings = readJsonFile(settingsFilename,
-  {stop: false}
-);
+var defaultSettings = {
+  stop: false,
+  speed: 3
+};
 
-var intervalID;
+var events = readJsonFile(eventsFilename, []);
+var settings = readJsonFile(settingsFilename, defaultSettings);
 
 function readJsonFile(filename, defaults) {
-  console.log ("Reading " + filename);
   try {
     return jsonfile.readFileSync(filename);
   }
 
   catch (e) {
-    console.log('Writing ' + filename);
     jsonfile.writeFileSync(filename, defaults, {spaces: 2});
     return defaults
   }
@@ -35,7 +34,8 @@ var cmds = {
   add: add,
   remove: remove,
   clear: clear,
-  stop: stop
+  stop: stop,
+  speed: speed
 };
 
 var args = process.argv.slice(2);
@@ -46,7 +46,9 @@ if (args.length === 0) {
   console.log('Add - Add an event ("Event title" 12/18/2018)');
   console.log('Remove - Remove an event (Specify index of event from List command)');
   console.log('Start - Start displaying event countdowns');
+  console.log('Stop - Stop displaying event countdowns');
   console.log('Clear - Clear the list of events');
+  console.log('Speed - Number of seconds to show each event (1-5)');
   console.log('');
 }
 
@@ -91,6 +93,23 @@ function sortEvents() {
   events = events.sort(yearCompare);
 }
 
+
+///////////////////////////////////////
+function speed() {
+  var newEvent = {};
+  var match = args[1].match(/(\d{1})/);
+  if (match) {
+    var speed = Number(match[1]);
+ 
+    if (speed >= 1 && speed <=5) {
+      settings.speed = speed;
+      jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+    } else {
+      console.log('Speed must be beween 1 -5');
+    }
+  }
+
+}
 
 ///////////////////////////////////////
 function add() {
@@ -208,17 +227,15 @@ function start() {
     }
 
     events = readJsonFile(eventsFilename, JSON.stringify([]));
-    settings = readJsonFile(settingsFilename,
-      [
-        {stop: false}
-      ]
-    );
+
+    if (next >= events.length) {
+      next = 0;
+    }
+
+    settings = readJsonFile(settingsFilename, defaultSettings);
 
     if (settings.stop) {
       console.log('Stopping...')
-
-      // Stop interval
-      clearInterval(intervalID);
 
       // Close serial
       sp.close(function (err) {
@@ -227,12 +244,9 @@ function start() {
       // Set stop in prefs to false
       settings.stop = false
       jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+    } else {
+      setTimeout(intervalFunc, settings.speed * 1000);
     }
-
-    if (next >= events.length) {
-      next = 0;
-    }
-
   }
 
 	sp.on('error', function(err) {
@@ -250,9 +264,8 @@ function start() {
       console.log('>>>>>', data);
     });
 
-    intervalID = setInterval(intervalFunc, 3000);
+    setTimeout(intervalFunc, settings.speed * 1000);
   });
 }
 
-// TODO Color background?
-// TODO Prefs: Cycle rate, Background color
+// TODO Prefs: Background color
