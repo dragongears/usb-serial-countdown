@@ -10,7 +10,7 @@ var colors = {
   yellow: [0xFF, 0x80, 0x00],
   green: [0x00, 0xFF, 0x00],
   blue: [0x00, 0x00, 0xFF],
-  purple: [0xFF, 0x00, 0xFF],
+  purple: [0xFF, 0x00, 0xFF]
 }
 
 var SerialPort = require("serialport");
@@ -53,7 +53,7 @@ var cmds = {
   clear: clear,
   stop: stop,
   speed: speed,
-  color, color
+  color: color
 };
 
 var args = process.argv.slice(2);
