@@ -21,7 +21,9 @@ var settingsFilename = 'settings.json';
 
 var defaultSettings = {
   stop: false,
-  speed: 3
+  speed: 3,
+  port: "/dev/ttyACM0",
+  baud: 115200
 };
 
 var events = readJsonFile(eventsFilename, []);
@@ -53,7 +55,9 @@ var cmds = {
   clear: clear,
   stop: stop,
   speed: speed,
-  color: color
+  color: color,
+  port: port,
+  baud, baud
 };
 
 var args = process.argv.slice(2);
@@ -69,6 +73,8 @@ if (args.length === 0) {
   console.log('Speed - Number of seconds to show each event (1-5)');
   console.log('Color - Display background color');
   console.log('        (White, Red, Orange, Yellow, Green, Blue, Purple)');
+  console.log('Port - Serial port for display');
+  console.log('Baud - Serial port baud rate');
   console.log('');
 }
 
@@ -113,6 +119,18 @@ function sortEvents() {
   events = events.sort(yearCompare);
 }
 
+
+///////////////////////////////////////
+function port() {
+  settings.serialPort = args[1];
+  jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+}
+
+///////////////////////////////////////
+function baud() {
+  settings.baudRate = Number(args[1]);
+  jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+}
 
 ///////////////////////////////////////
 function color() {
@@ -199,9 +217,9 @@ function stop() {
 ///////////////////////////////////////
 function start() {
   var sp = new SerialPort(
-    "/dev/ttyACM0",
+    settings.serialPort,
     {
-      baudRate: 115200
+      baudRate: settings.baudRate
     }
   );
 
