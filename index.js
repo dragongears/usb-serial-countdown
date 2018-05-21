@@ -220,6 +220,11 @@ function start() {
     settings.serialPort,
     {
       baudRate: settings.baudRate
+    }, function (err) {
+      if (err) {
+        console.log(err.message);
+        process.exit(1);
+      }
     }
   );
 
