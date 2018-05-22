@@ -53,8 +53,8 @@ module.exports = () => {
     console.log('List - List events');
     console.log('Add - Add an event ("Event title" 12/18/2018)');
     console.log('Remove - Remove an event (Specify index of event from List command)');
-    console.log('Start - Start displaying event countdowns');
-    console.log('Stop - Stop displaying event countdowns');
+    console.log('Start - Start displaying event countdown');
+    console.log('Stop - Stop displaying event countdown');
     console.log('Clear - Clear the list of events');
     console.log('--Settings-------------------------------------------');
     console.log('Speed - Number of seconds to show each event (1-5)');
