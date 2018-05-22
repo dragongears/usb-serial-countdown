@@ -7,7 +7,8 @@
     "usb-countdown": "bin/usb-countdown"
   },
   "scripts": {
-    "start": "nohup usb-countdown start >/dev/null 2>&1 &",
+    "start": "nohup ./bin/usb-countdown start >/dev/null 2>&1 &",
+    "stop": "./bin/usb-countdown stop",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
