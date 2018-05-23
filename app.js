@@ -149,9 +149,8 @@ module.exports = () => {
   function cmdStart() {
     countdown.start((err, result) => {
       if (err) {
+        console.log(err.message);
         process.exit(1);
-      } else {
-        console.log('Countdown start');
       }
     })
   }
