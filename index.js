@@ -29,19 +29,6 @@ var settings = {};
 var oldColor = [];
 
 ///////////////////////////////////////
-function init() {
-  events = readJsonFile(eventsFilename, []);
-  settings = readJsonFile(settingsFilename, defaultSettings);
-  oldColor = settings.color;
-
-  // The stop flag in settings should not be set when starting up
-  if (settings.stop) {
-    settings.stop = false
-    jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
-  }
-}
-
-///////////////////////////////////////
 function readJsonFile(filename, defaults) {
   try {
     return jsonfile.readFileSync(filename);
@@ -95,7 +82,7 @@ function sortEvents() {
 
 ///////////////////////////////////////
 var port = exports.port = function(serialPort, cb) {
-  init();
+  settings = readJsonFile(settingsFilename, defaultSettings);
   settings.serialPort = serialPort;
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
@@ -103,7 +90,7 @@ var port = exports.port = function(serialPort, cb) {
 
   ///////////////////////////////////////
 var baud = exports.baud = function(baudRate, cb) {
-  init();
+  settings = readJsonFile(settingsFilename, defaultSettings);
   settings.baudRate = Number(baudRate);
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
@@ -111,7 +98,9 @@ var baud = exports.baud = function(baudRate, cb) {
 
 ///////////////////////////////////////
 var color = exports.color = function(color, cb) {
-  init();
+  settings = readJsonFile(settingsFilename, defaultSettings);
+  oldColor = settings.color;
+
   if (!colors[color]) {
     cb(new Error('Color must be white, red, orange, yellow, green, blue, or purple'));
   } else if (color === oldColor) {
@@ -125,7 +114,7 @@ var color = exports.color = function(color, cb) {
 
 ///////////////////////////////////////
 var speed = exports.speed = function(speed, cb) {
-  init();
+  settings = readJsonFile(settingsFilename, defaultSettings);
   var match = speed.match(/(\d{1})/);
   if (match && (speed >= 1 && speed <=5)) {
     settings.speed = speed;
@@ -138,7 +127,7 @@ var speed = exports.speed = function(speed, cb) {
 
 ///////////////////////////////////////
 var add = exports.add = function(newEvent, cb) {
-  init();
+  events = readJsonFile(eventsFilename, []);
   events.push(newEvent);
   sortEvents();
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
@@ -148,7 +137,7 @@ var add = exports.add = function(newEvent, cb) {
 
 ///////////////////////////////////////
 var remove = exports.remove = function(eventIndex, cb) {
-  init();
+  events = readJsonFile(eventsFilename, []);
   events.splice(eventIndex, 1);
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
   list(()=>{});
@@ -157,7 +146,7 @@ var remove = exports.remove = function(eventIndex, cb) {
 
 ///////////////////////////////////////
 var clear = exports.clear = function(cb) {
-  init();
+  events = readJsonFile(eventsFilename, []);
   events = [];
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
   list(()=>{});
@@ -166,7 +155,7 @@ var clear = exports.clear = function(cb) {
 
 ///////////////////////////////////////
 var list = exports.list = function(cb) {
-  init();
+  events = readJsonFile(eventsFilename, []);
   events.forEach(function(event, idx) {
     console.log(idx + ') ' + event.event + ' ' + event.mm + '/' + event.dd + '/' + event.yy);
   });
@@ -175,7 +164,7 @@ var list = exports.list = function(cb) {
 
 ///////////////////////////////////////
 var stop = exports.stop = function(cb) {
-  init();
+  settings = readJsonFile(settingsFilename, defaultSettings);
   settings.stop = true
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
@@ -183,9 +172,18 @@ var stop = exports.stop = function(cb) {
 
 ///////////////////////////////////////
 var start = exports.start = function(cb) {
-  init();
+  events = readJsonFile(eventsFilename, []);
+  settings = readJsonFile(settingsFilename, defaultSettings);
+  oldColor = settings.color;
   var DateDiff = require('date-diff');
   var next = 0;
+
+  // The stop flag in settings should not be set when starting up
+  if (settings.stop) {
+    settings.stop = false
+    jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
+  }
+
   var sp = new SerialPort(
     settings.serialPort,
     {
