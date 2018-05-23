@@ -1,2 +1,3 @@
 #!/usr/bin/env node
-require('../')()
+console.log('usb-countdown');
+require('../app')()
