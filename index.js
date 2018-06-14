@@ -1,3 +1,13 @@
+'use strict';
+
+/**
+ * 
+ * USB Serial Countdown
+ * 
+ * A Node application to count down the days to events on a USB serial LCD display.
+ * 
+ */
+
 var exports = {};
 
 var SerialPort = require('serialport');
