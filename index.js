@@ -101,7 +101,7 @@ var port = exports.port = function(serialPort, cb) {
   ///////////////////////////////////////
 var baud = exports.baud = function(baudRate, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
-  settings.baudRate = Number(baudRate);
+  settings.baudRate = baudRate;
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
 }
@@ -123,13 +123,12 @@ var color = exports.color = function(color, cb) {
 }
 
 ///////////////////////////////////////
-var speed = exports.speed = function(speed, cb) {
+var speed = exports.speed = function(newSpeed, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
-  var match = speed.match(/(\d{1})/);
-  if (match && (speed >= 1 && speed <=5)) {
-    settings.speed = speed;
+  if (newSpeed >= 1 && newSpeed <= 5) {
+    settings.speed = newSpeed;
     jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
-    cb(null, speed);
+    cb(null, newSpeed);
   } else {
     cb(new Error('Speed must be beween 1 -5'));
   }

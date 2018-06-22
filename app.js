@@ -54,7 +54,7 @@ module.exports = () => {
 
   ///////////////////////////////////////
   function cmdBaud() {
-    countdown.baud(args[1], (err, result) => {
+    countdown.baud(Number(args[1]), (err, result) => {
       if (err) {
         process.exit(1);
       }
@@ -77,7 +77,7 @@ module.exports = () => {
 
   ///////////////////////////////////////
   function cmdSpeed() {
-    countdown.speed(args[1], (err, result) => {
+    countdown.speed(Number(args[1]), (err, result) => {
       if (err) {
         console.log(err);
         process.exit(1);
