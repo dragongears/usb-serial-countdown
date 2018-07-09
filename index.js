@@ -28,8 +28,9 @@ var defaultSettings = {
   stop: false,
   speed: 3,
   color: 'white',
-  port: "/dev/ttyACM0",
-  baud: 115200
+  serialPort: "/dev/ttyACM0",
+  baudRate: 115200,
+  serialGui: false
 };
 
 var events = [];
