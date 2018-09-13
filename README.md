@@ -4,7 +4,7 @@ A Node application to count down the days to events on a USB serial LCD display.
 
 [YouTube video](https://www.youtube.com/watch?v=v6HfXb4BzYo)
 
-[USB + SERIAL BACKPACK KIT WITH 16X2 RGB BACKLIGHT POSITIVE LCD](https://www.adafruit.com/products/782)
+[USB + Serial Backpack Kit with 16x2 RGB backlight positive LCD - Black on RGB](https://www.adafruit.com/products/782)
 
 Run `npm link` in the root directory to symlink the binary file to the system path, making it accessible from anywhere by running `usb-countdown`
 

@@ -90,23 +90,23 @@ function sortEvents() {
 }
 
 ///////////////////////////////////////
-var port = exports.port = function(serialPort, cb) {
+const port = exports.port = function(serialPort, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
   settings.serialPort = serialPort;
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
-}
+};
 
   ///////////////////////////////////////
-var baud = exports.baud = function(baudRate, cb) {
+const baud = exports.baud = function(baudRate, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
   settings.baudRate = baudRate;
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
-}
+};
 
 ///////////////////////////////////////
-var color = exports.color = function(color, cb) {
+const color = exports.color = function(color, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
   oldColor = settings.color;
 
@@ -119,10 +119,10 @@ var color = exports.color = function(color, cb) {
     jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
     cb(null, color);
   }
-}
+};
 
 ///////////////////////////////////////
-var speed = exports.speed = function(newSpeed, cb) {
+const speed = exports.speed = function(newSpeed, cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
   if (newSpeed >= 1 && newSpeed <= 5) {
     settings.speed = newSpeed;
@@ -131,55 +131,55 @@ var speed = exports.speed = function(newSpeed, cb) {
   } else {
     cb(new Error('Speed must be beween 1 -5'));
   }
-}
+};
 
 ///////////////////////////////////////
-var add = exports.add = function(newEvent, cb) {
+const add = exports.add = function(newEvent, cb) {
   events = readJsonFile(eventsFilename, []);
   events.push(newEvent);
   sortEvents();
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
   list(()=>{});
   cb(null, newEvent);
-}
+};
 
 ///////////////////////////////////////
-var remove = exports.remove = function(eventIndex, cb) {
+const remove = exports.remove = function(eventIndex, cb) {
   events = readJsonFile(eventsFilename, []);
   events.splice(eventIndex, 1);
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
   list(()=>{});
   cb(null, eventIndex);
-}
+};
 
 ///////////////////////////////////////
-var clear = exports.clear = function(cb) {
+const clear = exports.clear = function(cb) {
   events = readJsonFile(eventsFilename, []);
   events = [];
   jsonfile.writeFileSync(eventsFilename, events, {spaces: 2});
   list(()=>{});
   cb(null, 0);
-}
+};
 
 ///////////////////////////////////////
-var list = exports.list = function(cb) {
+const list = exports.list = function(cb) {
   events = readJsonFile(eventsFilename, []);
   events.forEach(function(event, idx) {
     console.log(idx + ') ' + event.event + ' ' + event.mm + '/' + event.dd + '/' + event.yy);
   });
   cb(null, 0);
-}
+};
 
 ///////////////////////////////////////
-var stop = exports.stop = function(cb) {
+const stop = exports.stop = function(cb) {
   settings = readJsonFile(settingsFilename, defaultSettings);
-  settings.stop = true
+  settings.stop = true;
   jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   cb(null, 0);
-}
+};
 
 ///////////////////////////////////////
-var start = exports.start = function(cb) {
+const start = exports.start = function(cb) {
   events = readJsonFile(eventsFilename, []);
   settings = readJsonFile(settingsFilename, defaultSettings);
   oldColor = settings.color;
@@ -188,7 +188,7 @@ var start = exports.start = function(cb) {
 
   // The stop flag in settings should not be set when starting up
   if (settings.stop) {
-    settings.stop = false
+    settings.stop = false;
     jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
   }
 
@@ -205,12 +205,12 @@ var start = exports.start = function(cb) {
 
   function intervalFunc() {
     if (events.length !== 0) {
-      var daysStr = [' day', ' days'];
-      var date2 = new Date(); // Today
+      const daysStr = [' day', ' days'];
+      let date2 = new Date(); // Today
 
-      var date1 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
-      var diff = new DateDiff(date1, date2);
-      var days = Math.ceil(diff.days());
+      let date1 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
+      let diff = new DateDiff(date1, date2);
+      let days = Math.ceil(diff.days());
 
       if (days < 0) {
         events.splice(next, 1);
@@ -222,7 +222,7 @@ var start = exports.start = function(cb) {
             stop();
           });
         }
-      } else if (days == 0) {
+      } else if (days === 0) {
         console.log(events[next].event);
         console.log(days.toString() + daysStr[+!!(days-1)]);
         sp.write([0xFE, 0x58]);
@@ -261,14 +261,14 @@ var start = exports.start = function(cb) {
     }
 
     if (settings.stop) {
-      console.log('Stopping...')
+      console.log('Stopping...');
 
       // Close serial
       sp.close(function (err) {
 
       });
       // Set stop in prefs to false
-      settings.stop = false
+      settings.stop = false;
       jsonfile.writeFileSync(settingsFilename, settings, {spaces: 2});
     } else {
       setTimeout(intervalFunc, settings.speed * 1000);
@@ -292,6 +292,6 @@ var start = exports.start = function(cb) {
 
     setTimeout(intervalFunc, settings.speed * 1000);
   });
-}
+};
 
 module.exports = exports;
