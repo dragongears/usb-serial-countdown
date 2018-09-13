@@ -1,9 +1,9 @@
 /**
- * 
+ *
  * USB Serial Countdown
- * 
+ *
  * A Node application to count down the days to events on a USB serial LCD display.
- * 
+ *
  */
 
 var exports = {};
@@ -206,11 +206,11 @@ const start = exports.start = function(cb) {
   function intervalFunc() {
     if (events.length !== 0) {
       const daysStr = [' day', ' days'];
-      let date2 = new Date(); // Today
 
-      let date1 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
-      let diff = new DateDiff(date1, date2);
-      let days = Math.ceil(diff.days());
+      let date1 = new Date(); // Today
+      let date2 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
+      let timeDiff = Math.abs(date2.getTime() - date1.getTime());
+      let days = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
       if (days < 0) {
         events.splice(next, 1);
