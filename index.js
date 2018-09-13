@@ -183,7 +183,6 @@ const start = exports.start = function(cb) {
   events = readJsonFile(eventsFilename, []);
   settings = readJsonFile(settingsFilename, defaultSettings);
   oldColor = settings.color;
-  var DateDiff = require('date-diff');
   var next = 0;
 
   // The stop flag in settings should not be set when starting up
