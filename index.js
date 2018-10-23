@@ -208,7 +208,7 @@ const start = exports.start = function(cb) {
 
       let date1 = new Date(); // Today
       let date2 = new Date(events[next].yy, events[next].mm - 1, events[next].dd); // Target date
-      let timeDiff = Math.abs(date2.getTime() - date1.getTime());
+      let timeDiff = date2.getTime() - date1.getTime();
       let days = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
       if (days < 0) {
