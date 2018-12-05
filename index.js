@@ -50,43 +50,21 @@ function readJsonFile(filename, defaults) {
 ///////////////////////////////////////
 // Date Sorting functions /////////////
 ///////////////////////////////////////
-function dayCompare(a, b) {
-  if (a.dd < b.dd) {
+function dateCompare(a, b) {
+  let aa = new Date(a.yy, a.mm, a.dd).getTime();
+  let bb = new Date(b.yy, b.mm, b.dd).getTime();
+
+  if (aa < bb) {
     return -1;
   }
-  if (a.dd > b.dd) {
+  if (aa > bb) {
     return 1;
   }
   return 0;
-
-}
-
-function monthCompare(a, b) {
-  if (a.mm < b.mm) {
-    return -1;
-  }
-  if (a.mm > b.mm) {
-    return 1;
-  }
-  return 0;
-
-}
-
-function yearCompare(a, b) {
-  if (a.yy < b.yy) {
-    return -1;
-  }
-  if (a.yy > b.yy) {
-    return 1;
-  }
-  return 0;
-
 }
 
 function sortEvents() {
-  events = events.sort(dayCompare);
-  events = events.sort(monthCompare);
-  events = events.sort(yearCompare);
+  events = events.sort(dateCompare);
 }
 
 ///////////////////////////////////////
