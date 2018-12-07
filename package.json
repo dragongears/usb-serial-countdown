@@ -1,6 +1,6 @@
 {
   "name": "usb-serial-countdown",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Countdown the days to events on a USB serial LCD display",
   "main": "index.js",
   "bin": {
@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nohup ./bin/usb-countdown start >/dev/null 2>&1 &",
     "stop": "./bin/usb-countdown stop",
-    "gui": "./electron-vue-serial-countdown-1.1.0-x86_64.AppImage",
+    "gui": "./electron-vue-serial-countdown-1.2.0-x86_64.AppImage",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
