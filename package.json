@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nohup ./bin/usb-countdown start >/dev/null 2>&1 &",
     "stop": "./bin/usb-countdown stop",
-    "gui": "./electron-vue-serial-countdown-1.2.0-x86_64.AppImage",
+    "gui": "./'USB Serial Countdown GUI 1.3.0.AppImage'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
