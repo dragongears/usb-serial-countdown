@@ -24,6 +24,6 @@
   "license": "ISC",
   "dependencies": {
     "jsonfile": "^3.0.1",
-    "serialport": "^5.0.0"
+    "serialport": "^7.1.4"
   }
 }
