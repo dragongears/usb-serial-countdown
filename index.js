@@ -6,6 +6,8 @@
  *
  */
 
+var path = require('path');
+
 var exports = {};
 
 var SerialPort = require('serialport');
@@ -23,6 +25,7 @@ var colors = {
 
 var eventsFilename = path.resolve(__dirname, 'events.json');
 var settingsFilename = path.resolve(__dirname, 'settings.json');
+console.log(settingsFilename);
 
 var defaultSettings = {
   stop: false,
